@@ -11,6 +11,14 @@ Wireguard requires that the host kernel includes the Wireguard module.
 
 For example, on AWS EKS the default AMIs do not currently (February 2023) support Wireguard, but the [BottleRocket AMIs](https://docs.aws.amazon.com/eks/latest/userguide/launch-node-bottlerocket.html) do.
 
+## Installation
+
+```
+helm upgrade --install wireguard oci://quay.io/manics/wireguard --version 0.1.0
+```
+
+See https://github.com/manics/wireguard-helm-chart/tags for the available versions.
+
 ## Configuration
 
 - `wireguard.accessibleIps`: Comma separate list of CIDRs that are accessible from the Wireguard network, e.g. `10.0.0.0/8, 172.16.0.0/20`, default `0.0.0.0/0`.
