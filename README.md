@@ -1,15 +1,15 @@
 # Wireguard Helm Chart
 
+[![CI Status](https://github.com/manics/wireguard-helm-chart/workflows/Test%20and%20Publish/badge.svg)](https://github.com/manics/wireguard-helm-chart/actions?query=branch%3Amain)
+
 Deploys a Wireguard server on Kubernetes.
 Wireguard listens on UDP port 51820 by default.
-
 
 ## Kubernetes node prerequisites
 
 Wireguard requires that the host kernel includes the Wireguard module.
 
 For example, on AWS EKS the default AMIs do not currently (February 2023) support Wireguard, but the [BottleRocket AMIs](https://docs.aws.amazon.com/eks/latest/userguide/launch-node-bottlerocket.html) do.
-
 
 ## Configuration
 
@@ -19,7 +19,6 @@ For example, on AWS EKS the default AMIs do not currently (February 2023) suppor
 - `persistence.enabled`: The generated server and client configuration files are stored in a persistent volume, default `true`.
 
 See [`values.yaml`](./values.yaml) for the full set of configuration parameters and defaults.
-
 
 ### Load-balancer configuration
 
@@ -39,7 +38,6 @@ service:
     service.beta.kubernetes.io/aws-load-balancer-healthcheck-protocol: TCP
 ```
 
-
 ## Client configuration
 
 When Wireguard starts it should generate configuration directories `/config/peer_*` for each client in `wireguard.clientPeers`.
@@ -49,6 +47,7 @@ These files can be copied from the Wireguard pod:
 kubectl exec deploy/wireguard -- ls /config/
 kubectl exec deploy/wireguard -c wireguard -- cat /config/peer_example1/peer_example1.conf > peer_example1.conf
 ```
+
 If necessary change `Endpoint` in `peer_example1.conf` to the external IP address of the loadbalancer.
 
 To connect to the Wireguard network on Linux:
@@ -56,11 +55,12 @@ To connect to the Wireguard network on Linux:
 ```
 wg-quick up peer_example1.conf
 ```
+
 Or using NetworkManager:
+
 ```
 nmcli con import type wireguard file peer_example1.conf
 ```
-
 
 ## References
 

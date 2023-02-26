@@ -1,0 +1,101 @@
+---
+name: Test and Publish
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  REPOSITORY: ${{ github.repository }}
+
+jobs:
+  precommit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    name: Run pre-commit
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+      - uses: pre-commit/action@v3.0.0
+
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    name: Test Helm chart
+    strategy:
+      matrix:
+        include:
+          - k3s-version: v1.21.0+k3s1
+            helm-version: v3.5.4
+          - k3s-version: v1.25.3+k3s1
+            helm-version: v3.11.1
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: k3s
+        uses: jupyterhub/action-k3s-helm@v3
+        with:
+          k3s-version: ${{ matrix.k3s-version }}
+          helm-version: ${{ matrix.helm-version }}
+        # This action should export KUBECONFIG
+
+      - name: Build
+        # No LoadBalancer
+        run: helm install test-wg ./ --set service.type=ClusterIP --wait
+
+      - name: Test
+        run: helm test test-wg
+
+  # This job can be used as a required status for Pull Requests
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    name: Status
+    needs:
+      - precommit
+      - test
+    steps:
+      - name: Status
+        run: |
+          echo "precommit: ${{ needs.precommit.result }}"
+          echo "test: ${{ needs.test.result }}"
+
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    name: Publish Helm chart
+    if: startsWith(github.ref, 'refs/tags/')
+    needs:
+      - precommit
+      - test
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check version matches tag
+        run: |
+          VERSION="$(yq -r .version Chart.yaml)"
+          echo "Chart version: $VERSION"
+          echo "App version: $(yq -r .appVersion Chart.yaml)"
+          if [ "$VERSION" != "${GITHUB_REF#refs/*/}" ]; then
+            echo "Chart version does not match tag"
+            exit 1
+          fi
+
+      - name: Login
+        run: echo ${{ secrets.GITHUB_TOKEN }} | helm registry login -u ${{ github.actor }} --password-stdin ${{ env.REGISTRY }}
+
+      - uses: azure/setup-helm@v3
+        with:
+          version: v3.11.1
+
+      - name: Build
+        run: helm package .
+
+      - name: Publish
+        run: helm push "wireguard-${GITHUB_REF#refs/*/}.tgz" "oci://${{ env.REGISTRY }}/${{ env.REPOSITORY }}"
