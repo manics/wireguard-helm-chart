@@ -10,8 +10,9 @@ permissions:
   packages: write
 
 env:
-  REGISTRY: ghcr.io
-  REPOSITORY: ${{ github.repository }}
+  REGISTRY: quay.io
+  REGISTRY_NAME: manics
+  PACKAGE_NAME: wireguard
 
 jobs:
   precommit:
@@ -90,7 +91,7 @@ jobs:
           fi
 
       - name: Login
-        run: echo ${{ secrets.GITHUB_TOKEN }} | helm registry login -u ${{ github.actor }} --password-stdin ${{ env.REGISTRY }}
+        run: echo ${{ secrets.REGISTRY_PASSWORD }} | helm registry login -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin ${{ env.REGISTRY }}
 
       - uses: azure/setup-helm@v3
         with:
@@ -100,4 +101,6 @@ jobs:
         run: helm package .
 
       - name: Publish
-        run: helm push "wireguard-${GITHUB_REF#refs/*/}.tgz" "oci://${{ env.REGISTRY }}/${{ env.REPOSITORY }}"
+        run: |
+          set -x
+          helm push "${{ env.PACKAGE_NAME }}-${GITHUB_REF#refs/*/}.tgz" "oci://${{ env.REGISTRY }}/${{ env.REGISTRY_NAME }}"
