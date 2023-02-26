@@ -78,7 +78,7 @@ spec:
               mountPath: /config/
           {{- end }}
         {{- if .Values.wireguard.httpHealthCheck }}
-        - name: {{ .Chart.Name }}-health
+        - name: httphealth
           image: {{ .Values.image.healthcheckRepository }}:{{ .Values.image.healthcheckTag }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -86,12 +86,12 @@ spec:
               containerPort: 58000
               protocol: TCP
           command:
-            - healthcheck
+            - /usr/local/bin/healthcheck
           volumeMounts:
             - name: wireguard-healthcheck
               mountPath: /usr/local/bin/healthcheck
               subPath: healthcheck.py
-        {{- end }}}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
