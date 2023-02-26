@@ -25,6 +25,7 @@ wireguard:
   peerDns:
   # Timezone
   timeZone: Etc/UTC
+  httpHealthCheck: false
 
 serviceAccount:
   # Specifies whether a service account should be created

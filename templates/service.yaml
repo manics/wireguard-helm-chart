@@ -15,10 +15,12 @@ spec:
       targetPort: 51820
       protocol: UDP
       name: wireguard
+    {{- if .Values.wireguard.httpHealthCheck }}
     - port: {{ .Values.service.healthHttpPort }}
       targetPort: 58000
       protocol: TCP
       name: http
+    {{- end }}
   selector:
     {{- include "wireguard.selectorLabels" . | nindent 4 }}
   {{- with .Values.service.loadBalancerSourceRanges }}

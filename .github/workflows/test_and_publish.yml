@@ -32,8 +32,10 @@ jobs:
         include:
           - k3s-version: v1.21.0+k3s1
             helm-version: v3.5.4
+            extra-args: --set service.type=ClusterIP
           - k3s-version: v1.25.3+k3s1
             helm-version: v3.11.1
+            extra-args: ""
     steps:
       - uses: actions/checkout@v3
 
@@ -46,7 +48,7 @@ jobs:
 
       - name: Build
         # No LoadBalancer
-        run: helm install test-wg ./ --set service.type=ClusterIP --wait
+        run: helm install test-wg ./ --wait ${{ matrix.extra-args }}
 
       - name: Test
         run: helm test test-wg
