@@ -1,0 +1,88 @@
+# Default values for wireguard.
+
+replicaCount: 1
+
+image:
+  repository: quay.io/linuxserver.io/wireguard
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+  healthcheckRepository: docker.io/library/python
+  healthcheckTag: 3.11.2-alpine3.17
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# serverCidr: 172.16.16.0/20
+
+wireguard:
+  # E.g. 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16
+  accessibleIps: "0.0.0.0/0"
+  # Configurations will be generated for each of these peers
+  clientPeers: "example1, example2"
+  # DNS servers to use for the peers
+  peerDns:
+  # Timezone
+  timeZone: Etc/UTC
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+persistence:
+  # Whether to write the configuration to persistent storage
+  enabled: true
+  existingClaim: ""
+  annotations: {}
+  accessMode: ReadWriteOnce
+  size: 100M
+  storageClass: ""
+
+
+securityContext:
+  capabilities:
+    add:
+      - NET_ADMIN
+
+service:
+  type: LoadBalancer
+  port: 51820
+  healthHttpPort: 58000
+  annotations: {}
+  loadBalancerSourceRanges: []
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

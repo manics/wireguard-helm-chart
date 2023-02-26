@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "wireguard.fullname" . }}-test-connection"
+  labels:
+    {{- include "wireguard.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  serviceAccountName: "{{ include "wireguard.fullname" . }}-test"
+  containers:
+    - name: healthcheck
+      image: docker.io/library/busybox
+      command:
+        - wget
+      args:
+        - '{{ include "wireguard.fullname" . }}:{{ .Values.service.healthHttpPort }}'
+    {{- $peerName := (split "," .Values.wireguard.clientPeers)._0 }}
+    - name: peerconfig
+      image: docker.io/alpine/k8s:1.26.1
+      command:
+        - kubectl
+      args:
+        - exec
+        - deploy/{{ include "wireguard.fullname" . }}
+        - -c
+        - wireguard
+        - --
+        - cat
+        - /config/peer_{{ $peerName }}/peer_{{ $peerName }}.conf
+  restartPolicy: Never
