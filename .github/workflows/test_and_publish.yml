@@ -20,9 +20,9 @@ jobs:
     timeout-minutes: 2
     name: Run pre-commit
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-      - uses: pre-commit/action@v3.0.0
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+      - uses: pre-commit/action@v3.0.1
 
   test:
     runs-on: ubuntu-latest
@@ -34,14 +34,14 @@ jobs:
           - k3s-version: v1.21.0+k3s1
             helm-version: v3.5.4
             extra-args: --set service.type=ClusterIP
-          - k3s-version: v1.25.3+k3s1
-            helm-version: v3.11.1
+          - k3s-version: v1.31.4+k3s1
+            helm-version: v3.16.2
             extra-args: ""
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - id: k3s
-        uses: jupyterhub/action-k3s-helm@v3
+        uses: jupyterhub/action-k3s-helm@v4
         with:
           k3s-version: ${{ matrix.k3s-version }}
           helm-version: ${{ matrix.helm-version }}
@@ -77,7 +77,7 @@ jobs:
       - precommit
       - test
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Check version matches tag
         run: |
@@ -92,9 +92,9 @@ jobs:
       - name: Login
         run: echo ${{ secrets.REGISTRY_PASSWORD }} | helm registry login -u ${{ secrets.REGISTRY_USERNAME }} --password-stdin ${{ env.REGISTRY }}
 
-      - uses: azure/setup-helm@v3
+      - uses: azure/setup-helm@v4
         with:
-          version: v3.11.1
+          version: v3.16.2
 
       - name: Build
         run: helm package .
