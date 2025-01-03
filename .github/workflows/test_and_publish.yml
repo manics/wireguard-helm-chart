@@ -29,6 +29,7 @@ jobs:
     timeout-minutes: 10
     name: Test Helm chart
     strategy:
+      fail-fast: false
       matrix:
         include:
           - k3s-version: v1.21.0+k3s1
