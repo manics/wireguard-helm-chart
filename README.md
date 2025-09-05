@@ -14,7 +14,7 @@ For example, on AWS EKS the default AMIs do not currently (February 2023) suppor
 ## Installation
 
 ```
-helm upgrade --install wireguard oci://quay.io/manics/wireguard --version 0.1.0
+helm upgrade --install wireguard oci://quay.io/manics/wireguard --version 0.2.0
 ```
 
 See https://github.com/manics/wireguard-helm-chart/tags for the available versions.
