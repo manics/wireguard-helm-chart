@@ -29,6 +29,8 @@ wireguard:
   clientPeers: "example1,example2"
   # DNS servers to use for the peers
   peerDns:
+  # Log generated client configurations
+  showConfigs: "false"
   # Timezone
   timeZone: Etc/UTC
 

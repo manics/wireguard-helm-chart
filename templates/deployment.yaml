@@ -41,7 +41,7 @@ spec:
             - name: ALLOWEDIPS
               value: {{ .Values.wireguard.accessibleIps }}
             - name: LOG_CONFS
-              value: "false"
+              value: {{ .Values.wireguard.showConfigs | quote }}
             - name: PEERS
               value: {{ .Values.wireguard.clientPeers }}
             {{- with .Values.wireguard.peerDns }}
