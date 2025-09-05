@@ -56,6 +56,12 @@ jobs:
       - name: Test
         run: helm test test-wg
 
+      - name: Report
+        uses: jupyterhub/action-k8s-namespace-report@v1
+        if: always()
+        with:
+          important-workloads: deploy/test-wg-wireguard
+
   # This job can be used as a required status for Pull Requests
   status:
     runs-on: ubuntu-24.04
