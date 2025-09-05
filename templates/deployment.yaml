@@ -13,8 +13,9 @@ spec:
       {{- include "wireguard.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -56,7 +57,7 @@ spec:
                 - ip
                 - link
                 - show
-                - wg0
+                - {{ .Values.probeInterface }}
                 - up
             initialDelaySeconds: 5
             periodSeconds: 5
@@ -66,16 +67,23 @@ spec:
                 - ip
                 - link
                 - show
-                - wg0
+                - {{ .Values.probeInterface }}
                 - up
             initialDelaySeconds: 5
             periodSeconds: 5
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- if .Values.persistence.enabled }}
+          {{- if or .Values.persistence.enabled .Values.configFiles }}
           volumeMounts:
+          {{- end }}
+          {{- if .Values.persistence.enabled }}
             - name: wireguard-peers-config
               mountPath: /config/
+          {{- end }}
+          {{- if .Values.configFiles }}
+            - name: etc-wireguard
+              mountPath: /etc/wireguard/
+              # readOnly: true
           {{- end }}
         {{- if .Values.healthcheck.enabled }}
         - name: httphealth
@@ -87,6 +95,7 @@ spec:
               protocol: TCP
           command:
             - /usr/local/bin/healthcheck
+            - {{ .Values.probeInterface }}
           volumeMounts:
             - name: wireguard-healthcheck
               mountPath: /usr/local/bin/healthcheck
@@ -122,4 +131,9 @@ spec:
             items:
             - key: healthcheck.py
               path: healthcheck.py
+      {{- end }}
+      {{- if .Values.configFiles }}
+        - name: etc-wireguard
+          secret:
+            secretName: {{ include "wireguard.fullname" . }}
       {{- end }}
