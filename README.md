@@ -25,6 +25,7 @@ See https://github.com/manics/wireguard-helm-chart/tags for the available versio
 - `wireguard.clientPeers`: Either the number of client configurations to generate, or a comma separated list of client names that will be used to generate the client configuration files, default `example1, example2`.
 - `wireguard.peerDns`: The DNS server to advertise to clients, default is the same as the Wireguard server (unlikely to work unless the DNS server is included in `accessibleIps`).
 - `persistence.enabled`: The generated server and client configuration files are stored in a persistent volume, default `true`.
+- `configFiles` is a map of `filename.conf: file content` to fully override the Wireguard configuration
 
 See [`values.yaml`](./values.yaml) for the full set of configuration parameters and defaults.
 
@@ -37,8 +38,10 @@ The Wireguard pod includes a simple HTTP server listening on port 58000 that ret
 For example, to use an external AWS load-balancer add the following annotations to the service:
 
 ```yaml
-wireguard:
-  httpHealthCheck: true
+# wireguard:
+
+healthcheck:
+  enabled: true
 
 service:
   annotations:

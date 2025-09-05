@@ -15,8 +15,8 @@ spec:
       targetPort: 51820
       protocol: UDP
       name: wireguard
-    {{- if .Values.wireguard.httpHealthCheck }}
-    - port: {{ .Values.service.healthHttpPort }}
+    {{- if .Values.healthcheck.enabled }}
+    - port: {{ .Values.service.healthcheckPort }}
       targetPort: 58000
       protocol: TCP
       name: http
