@@ -1,12 +1,8 @@
-{{- if .Values.wireguard.httpHealthCheck }}
+{{- if .Values.healthcheck.enabled }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: {{ include "wireguard.fullname" . }}-healthcheck
-  {{- with .Values.service.annotations }}
-  annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   labels:
     {{- include "wireguard.labels" . | nindent 4 }}
 data:

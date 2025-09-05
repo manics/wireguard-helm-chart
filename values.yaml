@@ -7,8 +7,14 @@ image:
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""
-  healthcheckRepository: docker.io/library/python
-  healthcheckTag: 3.11.2-alpine3.17
+
+healthcheck:
+  # Run a sidecar that exposes a HTTP health endpoint that can be used by LoadBalancers
+  enabled: false
+  image:
+    repository: docker.io/library/python
+    pullPolicy: IfNotPresent
+    tag: 3.13.7-alpine3.22
 
 imagePullSecrets: []
 nameOverride: ""
@@ -25,7 +31,6 @@ wireguard:
   peerDns:
   # Timezone
   timeZone: Etc/UTC
-  httpHealthCheck: false
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -58,7 +63,7 @@ securityContext:
 service:
   type: LoadBalancer
   port: 51820
-  healthHttpPort: 58000
+  healthcheckPort: 58000
   annotations: {}
   loadBalancerSourceRanges: []
 

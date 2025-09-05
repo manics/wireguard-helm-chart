@@ -9,13 +9,13 @@ metadata:
 spec:
   serviceAccountName: "{{ include "wireguard.fullname" . }}-test"
   containers:
-    {{- if .Values.wireguard.httpHealthCheck }}
+    {{- if .Values.healthcheck.enabled }}
     - name: httphealthcheck
       image: docker.io/library/busybox
       command:
         - wget
       args:
-        - '{{ include "wireguard.fullname" . }}:{{ .Values.service.healthHttpPort }}'
+        - '{{ include "wireguard.fullname" . }}:{{ .Values.service.healthcheckPort }}'
     {{- end }}
     {{- $peerName := (split "," .Values.wireguard.clientPeers)._0 }}
     - name: peerconfig

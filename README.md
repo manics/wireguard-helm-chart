@@ -37,8 +37,10 @@ The Wireguard pod includes a simple HTTP server listening on port 58000 that ret
 For example, to use an external AWS load-balancer add the following annotations to the service:
 
 ```yaml
-wireguard:
-  httpHealthCheck: true
+# wireguard:
+
+healthcheck:
+  enabled: true
 
 service:
   annotations:

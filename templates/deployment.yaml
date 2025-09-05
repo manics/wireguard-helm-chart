@@ -77,10 +77,10 @@ spec:
             - name: wireguard-peers-config
               mountPath: /config/
           {{- end }}
-        {{- if .Values.wireguard.httpHealthCheck }}
+        {{- if .Values.healthcheck.enabled }}
         - name: httphealth
-          image: {{ .Values.image.healthcheckRepository }}:{{ .Values.image.healthcheckTag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: {{ .Values.healthcheck.image.repository }}:{{ .Values.healthcheck.image.tag }}
+          imagePullPolicy: {{ .Values.healthcheck.image.pullPolicy }}
           ports:
             - name: http
               containerPort: 58000
@@ -114,6 +114,7 @@ spec:
             claimName: {{ include "wireguard.fullname" . }}
           {{- end }}
       {{- end }}
+      {{- if .Values.healthcheck.enabled }}
         - name: wireguard-healthcheck
           configMap:
             name: {{ include "wireguard.fullname" . }}-healthcheck
@@ -121,3 +122,4 @@ spec:
             items:
             - key: healthcheck.py
               path: healthcheck.py
+      {{- end }}
