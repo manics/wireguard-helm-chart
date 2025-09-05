@@ -3,4 +3,4 @@ name: wireguard
 description: Wireguard VPN
 type: application
 version: 0.1.0
-appVersion: 1.0.20210914
+appVersion: 1.0.20250521
