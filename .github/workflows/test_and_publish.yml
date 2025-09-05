@@ -36,10 +36,9 @@ jobs:
         include:
           - k3s-version: v1.25.3+k3s1
             helm-version: v3.5.4
-            extra-args: --set service.type=ClusterIP
           - k3s-version: v1.33.3+k3s1
             helm-version: v3.18.6
-            extra-args: ""
+            extra-args: "-f example-configfile.yaml"
     steps:
       - uses: actions/checkout@v5
 
